@@ -13,9 +13,6 @@ export async function GET() {
 
         return NextResponse.json({ results: response.results });
     } catch (error) {
-        console.error("❌ Error fetching Notion data:");
-        console.error(error); // logs full trace with stack + details
-
         return NextResponse.json(
             {
                 message: "Error fetching devotion",

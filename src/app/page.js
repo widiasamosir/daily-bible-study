@@ -22,7 +22,6 @@ export default function Home() {
           setDevotions([]);
         }
       } catch (err) {
-        console.error("Error fetching devotions:", err);
         setDevotions([]);
       }
     };
@@ -49,7 +48,6 @@ export default function Home() {
       selectedDevotion?.properties?.Date?.title?.[0]?.plain_text ||
       "Unknown date";
 
-  // 📌 Generate image & share
   const handleShare = async () => {
     try {
       const dataUrl = await htmlToImage.toPng(cardRef.current);
