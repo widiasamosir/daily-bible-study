@@ -1,75 +1,120 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import DevotionCard from "../components/DevotionCard";
+import * as htmlToImage from "html-to-image";
 
 export default function Home() {
   const [devotions, setDevotions] = useState([]);
   const [selectedId, setSelectedId] = useState(null);
+  const cardRef = useRef(null);
 
   useEffect(() => {
-    const fetchDevotions = async () => {
+    const fetchDevotion = async () => {
       try {
         const res = await fetch("/api/devotion");
         const data = await res.json();
 
         if (Array.isArray(data.results)) {
           setDevotions(data.results);
-          console.log(data.results);
-          setSelectedId(data.results[0]?.id); // pick first devotion by default
+          setSelectedId(data.results[0]?.id); // default first devotion
         } else {
           setDevotions([]);
         }
       } catch (err) {
         console.error("Error fetching devotions:", err);
+        setDevotions([]);
       }
     };
 
-    fetchDevotions();
+    fetchDevotion();
   }, []);
 
-  if (!devotions.length)
+  if (!devotions.length) {
     return <div className="text-center p-8">No devotion available</div>;
+  }
 
-  const selected = devotions.find((d) => d.id === selectedId);
+  const selectedDevotion = devotions.find((d) => d.id === selectedId);
 
   const chapter =
-      selected?.properties?.Chapter?.rich_text?.[0]?.plain_text || "Untitled";
+      selectedDevotion?.properties?.Chapter?.rich_text?.[0]?.plain_text ||
+      "Untitled";
 
   const content =
-      selected?.properties?.Devotion?.rich_text
+      selectedDevotion?.properties?.Devotion?.rich_text
           ?.map((r) => r.plain_text)
           .join("") || "No content";
 
   const date =
-      selected?.properties?.Date?.title?.[0]?.plain_text || "Unknown date";
+      selectedDevotion?.properties?.Date?.title?.[0]?.plain_text ||
+      "Unknown date";
+
+  // 📌 Generate image & share
+  const handleShare = async () => {
+    try {
+      const dataUrl = await htmlToImage.toPng(cardRef.current);
+      const blob = await (await fetch(dataUrl)).blob();
+      const file = new File([blob], "devotion.png", { type: "image/png" });
+
+      if (navigator.canShare && navigator.canShare({ files: [file] })) {
+        await navigator.share({
+          files: [file],
+          title: "Daily Devotion",
+          text: "Check out today’s devotion 🙏",
+        });
+      } else {
+        // fallback to WhatsApp Web (just text)
+        window.open(
+            `https://wa.me/?text=${encodeURIComponent(
+                `📖 ${chapter} (${date})\n\n${content}`
+            )}`,
+            "_blank"
+        );
+      }
+    } catch (err) {
+      console.error("Error sharing:", err);
+    }
+  };
 
   return (
-      <main className="min-h-screen bg-gray-100 flex flex-col items-center justify-center p-4 space-y-4">
+      <main className="min-h-screen bg-gray-100 flex flex-col items-center justify-center p-4 space-y-6">
+        {/* Title Section */}
         <div className="text-center">
           <h1 className="text-2xl font-bold">안녕하세요!!!!</h1>
           <p className="text-lg text-gray-700">
             Welcome to Daily Bible Study Tracker
           </p>
         </div>
+
+        {/* Scripture picker */}
         <select
-            className="p-2 border rounded-md"
+            className="p-2 border rounded"
             value={selectedId || ""}
             onChange={(e) => setSelectedId(e.target.value)}
         >
           {devotions.map((d) => {
-            const ch =
+            const label =
                 d.properties?.Chapter?.rich_text?.[0]?.plain_text || "Untitled";
             return (
                 <option key={d.id} value={d.id}>
-                  {ch}
+                  {label}
                 </option>
             );
           })}
         </select>
 
-        {/* Devotion Card */}
-        <DevotionCard title={chapter} content={content} date={date} />
+        {/* Devotion card with ref */}
+        <div ref={cardRef}>
+          <DevotionCard title={chapter} content={content} date={date} />
+        </div>
+
+        {/* Share button */}
+        <button
+            onClick={handleShare}
+            className="px-4 py-2 bg-gray-500 text-white rounded-full shadow hover:bg-gray-600"
+        >
+          📤 Share
+        </button>
       </main>
   );
 }
