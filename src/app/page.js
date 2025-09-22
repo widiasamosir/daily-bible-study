@@ -58,7 +58,7 @@ export default function Home() {
         await navigator.share({
           files: [file],
           title: "Daily Devotion",
-          text: "Check out today’s devotion 🙏",
+          text: "Hi all!! Check out today’s devotion 🙏 (https://daily-bible-study.vercel.app/)",
         });
       } else {
         // fallback to WhatsApp Web (just text)
