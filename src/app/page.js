@@ -8,16 +8,18 @@ export default function Home() {
   const [devotions, setDevotions] = useState([]);
   const [selectedId, setSelectedId] = useState(null);
   const cardRef = useRef(null);
-
+  const [isLoading, setIsLoading] = useState(true);
   useEffect(() => {
     const fetchDevotion = async () => {
       try {
+        setIsLoading(true);
         const res = await fetch("/api/devotion");
         const data = await res.json();
 
         if (Array.isArray(data.results)) {
           setDevotions(data.results);
           setSelectedId(data.results[0]?.id); // default first devotion
+          setIsLoading(false);
         } else {
           setDevotions([]);
         }
@@ -29,9 +31,24 @@ export default function Home() {
     fetchDevotion();
   }, []);
 
-  if (!devotions.length) {
+  if (!devotions.length && !isLoading) {
     return <div className="text-center p-8">No devotion available</div>;
   }
+
+  if (isLoading) {
+    return (
+        <div className="flex flex-col items-center justify-center min-h-screen">
+          {/* Spinner */}
+          <div className="animate-spin rounded-full h-12 w-12 border-t-4 border-blue-500 border-b-4 border-gray-200 mb-4"></div>
+
+          {/* Message */}
+          <p className="text-gray-700 text-lg">Please Waiting ..... </p>
+        </div>
+    );
+  }
+
+
+
 
   const selectedDevotion = devotions.find((d) => d.id === selectedId);
 
