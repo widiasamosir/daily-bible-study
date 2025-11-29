@@ -19,6 +19,18 @@
   }
 }
 
+/* app/globals.css or equivalent */
+
+.highlighted-verse {
+  /* Tailwind CSS utility classes */
+  @apply bg-yellow-100 p-1 rounded inline-block;
+}
+
+/* Ensure the space between verses is minimal but present */
+.highlighted-verse + .highlighted-verse {
+  margin-left: 0.25rem;
+}
+
 body {
   background: var(--background);
   color: var(--foreground);
