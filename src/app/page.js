@@ -163,7 +163,7 @@ export default function Home() {
         <header className="max-w-7xl mx-auto mb-12 flex flex-col md:flex-row justify-between items-center border-b border-gray-200 pb-6">
           <div>
             <h1 className="text-4xl font-serif font-bold text-gray-900 tracking-tight">Self Bible Study</h1>
-            <p className="text-gray-500 font-serif italic">"Thy word is a lamp unto my feet"</p>
+            <p className="text-gray-500 font-serif italic">&quot;Thy word is a lamp unto my feet&quot;</p>
           </div>
 
           <div className="flex items-center gap-0 mt-6 md:mt-0 bg-white shadow-md border-2 border-gray-400 rounded-lg overflow-hidden">

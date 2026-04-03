@@ -74,7 +74,7 @@ export default function ScriptureViewer({ book, chapter, markedVerse = [] }) {
         };
 
         fetchScripture();
-    }, [book, chapter, reference, versesToHighlight.join(',')]);
+    }, [book, chapter, reference, versesToHighlight]);
     // Re-run if book, chapter, or the array of verses to highlight changes
 
     return (
