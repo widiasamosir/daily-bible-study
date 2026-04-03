@@ -49,11 +49,14 @@ export default function ScriptureViewer({ book, chapter, markedVerse = [] }) {
                     setScriptureText("Could not find scripture text for this reference.");
                 } else {
                     // Combine all verses into a single string, applying conditional highlighting
+                    // Inside ScriptureViewer.js map function:
                     const text = data.verses.map(v => {
                         const isHighlighted = versesToHighlight.includes(v.verse);
 
-                        // Conditionally add the 'highlighted-verse' class
-                        const className = isHighlighted ? 'highlighted-verse' : '';
+                        // Applying CSS classes for a "marker" look
+                        const className = isHighlighted
+                            ? 'bg-yellow-100 border-b-2 border-yellow-400 font-bold px-1 rounded'
+                            : '';
 
                         return `<span class="${className}"><sup>${v.verse}</sup> ${v.text}</span>`;
                     }).join(' ');
