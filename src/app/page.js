@@ -88,15 +88,32 @@ export default function Home() {
   }, [devotionsForBook]);
 
   // 1. Initial Load: Set defaults
+  // 1. Initial Load: Set defaults to the LATEST scripture available
   useEffect(() => {
-    if (devotions.length > 0 && !selectedId) {
+    if (devotions.length > 0 && !selectedId && uniqueBooks.length > 0) {
+      // 1. Get the last book in the Bible order list that we have data for
       const latestBook = uniqueBooks[uniqueBooks.length - 1];
-      const bookDevs = devotions.filter(d => parseScripture(extractRichText(d.properties?.Chapter)).book === latestBook);
-      const latestDev = bookDevs[bookDevs.length - 1];
 
-      setSelectedBook(latestBook);
-      setSelectedChapter(parseScripture(extractRichText(latestDev.properties?.Chapter)).chapterNum);
-      setSelectedId(latestDev.id);
+      // 2. Get all devotions for that specific book
+      const bookDevs = devotions.filter(
+          d => parseScripture(extractRichText(d.properties?.Chapter)).book === latestBook
+      );
+
+      // 3. Sort them numerically by chapter number so the highest is at the end
+      const sortedDevs = [...bookDevs].sort((a, b) => {
+        const chA = parseInt(parseScripture(extractRichText(a.properties?.Chapter)).chapterNum) || 0;
+        const chB = parseInt(parseScripture(extractRichText(b.properties?.Chapter)).chapterNum) || 0;
+        return chA - chB;
+      });
+
+      // 4. Pick the absolute latest chapter
+      const latestDev = sortedDevs[sortedDevs.length - 1];
+
+      if (latestDev) {
+        setSelectedBook(latestBook);
+        setSelectedChapter(parseScripture(extractRichText(latestDev.properties?.Chapter)).chapterNum);
+        setSelectedId(latestDev.id);
+      }
     }
   }, [devotions, uniqueBooks, selectedId]);
 
